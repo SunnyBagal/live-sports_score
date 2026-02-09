@@ -15,7 +15,7 @@ matchRouter.get('/', async (req, res) => {
 
     if (!parsed.success) {
         return res.status(400).json({
-            message: 'Invalid query', details: JSON.stringify(parsed.error)
+            message: 'Invalid query', details: parsed.error.issues
         });
     }
 
@@ -41,11 +41,12 @@ matchRouter.post('/', async (req, res) => {
     const parsed = createMatchSchema.safeParse(req.body);
     if (!parsed.success) {
         return res.status(400).json({
-            message: 'Invalid request body', details: JSON.stringify(parsed.error)
+            message: 'Invalid request body', details: parsed.error.issues
         });
     }
-    const { startTime, endTime, homeScore, awayScore } = parsed.data;
-    try {
+
+    const {startTime, endTime, homeScore, awayScore} = parsed.data;
+
     try {
         const [event] = await db.insert(matches).values({
             ...parsed.data,
@@ -59,9 +60,10 @@ matchRouter.post('/', async (req, res) => {
         res.status(201).json({
             data: event
         })
-    }
-    catch(e){res.status(500).json({
-        error: 'Failed to create match.', details: JSON.stringify(e)});
+    } catch (e) {
+        res.status(500).json({
+            error: 'Failed to create match.', details: JSON.stringify(e)
+        });
     }
 
 })
