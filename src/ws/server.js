@@ -39,7 +39,7 @@ export function attachWebSocketServer(server){
         });
     },30000);
 
-    wss.on('close', () => clearInterval(interval) );8
+    wss.on('close', () => clearInterval(interval) );
 
     function broadcastMatchCreated(match){
         broadcast(wss, {type: 'match_created', data: match})
