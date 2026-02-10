@@ -1,7 +1,7 @@
 import arcjet,{detectBot,shield,slidingWindow} from "@arcjet/node";
 
 const arcjetKey = process.env.ARCJET_KEY;
-const arcjetMode = process.env.ARCJET_MODE === 'DRY_RUN' ? 'DRY_RUN' : 'LIVE';
+const arcjetMode = process.env.ARCJET_ENV === 'DRY_RUN' ? 'DRY_RUN' : 'LIVE';
 
 if (!arcjetKey) throw new Error('Arcjet key env variable is missing or missing arcjet');
 
@@ -41,6 +41,12 @@ export function securityMiddleware(){
                 }
                 return res.status(403).json({
                     error: 'Forbidden'
+                });
+            }
+
+            if (typeof decision.isChallenged === 'function' && decision.isChallenged()){
+                return res.status(403).json({
+                    error: 'Verification required'
                 });
             }
 
