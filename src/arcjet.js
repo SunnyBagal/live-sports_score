@@ -1,7 +1,7 @@
 import arcjet,{detectBot,shield,slidingWindow} from "@arcjet/node";
 
 const arcjetKey = process.env.ARCJET_KEY;
-const arcjetMode = process.env.ARCJET_ENV === 'DRY_RUN' ? 'DRY_RUN' : 'LIVE';
+const arcjetMode = process.env.ARCJET_ENV === 'development' ? 'DRY_RUN' : 'LIVE';
 
 if (!arcjetKey) throw new Error('Arcjet key env variable is missing or missing arcjet');
 
@@ -27,8 +27,11 @@ export const wsArcjet = arcjetKey ?
 
 
 export function securityMiddleware(){
+
     return async (req, res, next) => {
         if(!httpArcjet) return next();
+
+        if(req.path?.startsWith('/ws')) return next();
 
         try {
             const decision = await httpArcjet.protect(req);
